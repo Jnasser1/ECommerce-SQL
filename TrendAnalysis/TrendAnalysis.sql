@@ -1,5 +1,5 @@
 
-# conversion rates - rate at which session cONverts to sale
+# conversion rates - rate at which session converts to sale
 SELECT 
 WS.utm_content, 
 COUNT(distinct WS.website_session_id) as sessions,
