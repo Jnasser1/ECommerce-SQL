@@ -12,7 +12,7 @@ Use cases:
 Utilize utm parameters to identify traffic visting the buisness site that we are not paying for.
 Non non-paid traffic (organic, search, direct type-in), we analyze data when the utm parameters are NULL
 
-Organic and direct traffic is a health indicator for buisness brand.
+Organic and direct traffic is a health indicator for business brand.
 */
 
 
