@@ -10,7 +10,7 @@ Common use cases:
 We will be using website_pageviews data to identify users who viewed the \products page and see which product they clicked.
 From specific product pages we can get view-to-order conversion rates and create multi-step conversion funnels
 
-We will be using temporary tables or CTEs to break the query into manageable steps.
+We will be using temporary tables break the query into manageable steps.
 */
 
 
