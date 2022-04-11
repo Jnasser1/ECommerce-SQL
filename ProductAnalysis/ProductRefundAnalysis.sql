@@ -72,7 +72,7 @@ count(distinct case when order_items.product_id=4 then order_items.order_item_id
 
 from order_items left join order_item_refunds 
 on order_items.order_item_id=order_item_refunds.order_item_id
-where order_items.created_at < '2014-11-01'
+where order_items.created_at < '2014-10-15'
 group by 1,2;
 
 
@@ -104,7 +104,7 @@ Query tail snippet:
 
 2014, 8, 961, **0.1374, 239, 0.0167, 295, 0.0678, 307, 0.0065
 2014, 9, 1056, **0.1326, 250, 0.0320, 317, 0.0662, 327, 0.0122
-2014, 10, 1173, **0.0247, 285, 0.0175, 368, 0.0462, 377, 0.0212
+2014, 10, 511, **0.0274, 136, 0.0074, 164, 0.0488, 154, 0.0325
 
 ** Note the drop in product1_refund_rates
 
