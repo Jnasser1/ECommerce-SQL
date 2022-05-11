@@ -176,24 +176,16 @@ Product 2: (Month,Week)   (2,6), (1,1), month of janurary
 -- In general months 12, 11, 1, 2, 10, 3
 
 
+
 select
-week(orders.created_at) as wk,
-year(orders.created_at) as yr,
-month(orders.created_at) as mth,
-
-
+ year(orders.created_at) as yr,
+ month(orders.created_at) as mth,
+ week(orders.created_at) as wk,
 /***** product 1 metrics *****/
 -- revenue
 sum(case when product_level.product_group = 'product-1' then orders.price_usd else null end) as p1_revenue,
 
 sum(case when product_level.product_group = 'product-1' then orders.price_usd - orders.cogs_usd else null end) as p1_profit,
-
--- margin
-sum(case when product_level.product_group = 'product-1' then orders.price_usd - orders.cogs_usd else null end)
-/
-sum(case when product_level.product_group = 'product-1' then orders.price_usd else null end) 
-as p1_margin,
-
 
 
 /***** product 2 metrics *****/
@@ -201,42 +193,19 @@ sum(case when product_level.product_group = 'product-2' then orders.price_usd el
 
 sum(case when product_level.product_group = 'product-2' then orders.price_usd - orders.cogs_usd else null end) as p2_profit,
 
-sum(case when product_level.product_group = 'product-2' then orders.price_usd - orders.cogs_usd else null end)
-/
-sum(case when product_level.product_group = 'product-2' then orders.price_usd else null end) 
-as p2_margin,
-
-
-
 /***** product 3 metrics *****/
 sum(case when product_level.product_group = 'product-3' then orders.price_usd else null end) as p3_revenue,
 
 sum(case when product_level.product_group = 'product-3' then orders.price_usd - orders.cogs_usd else null end) as p3_profit,
 
-sum( case when product_level.product_group = 'product-3' then orders.price_usd - orders.cogs_usd else null end)
-/
-sum(case when product_level.product_group = 'product-3' then orders.price_usd else null end) 
-as p3_margin,
 
 
 /*
 Product 4 has not been out long enough to get data from black friday or cyber monday.
--- product 4 metrics 
-sum(case when product_level.product_group = 'product-4' then orders.price_usd else null end) as p4_revenue,
-
-sum(case when product_level.product_group = 'product-4' then orders.price_usd - orders.cogs_usd else null end) as p4_profit,
-
-sum(case when product_level.product_group = 'product-4' then orders.price_usd - orders.cogs_usd else null end)
-/
-sum(case when product_level.product_group = 'product-4' then orders.price_usd else null end) 
-as p4_margin,
-
 */
 
-
-sum(orders.price_usd) as total_revenue,
-sum(orders.price_usd-orders.cogs_usd) as total_profit,
-sum(orders.price_usd-orders.cogs_usd)/sum(orders.price_usd)  as total_margin
+ sum(orders.price_usd) as total_revenue,
+ sum(orders.price_usd-orders.cogs_usd) as total_profit
 from (
 select 
 product_id,
@@ -252,9 +221,48 @@ from products
 ) as product_level
 left join orders
 on  orders.primary_product_id = product_level.product_id
-where week(orders.created_at) in ( '44', '45', '46', '47' '48')
-group by 1,2
-order by 1 asc;
+group by 1,2,3
+order by 1, 2, 3 asc;
 
 
+
+
+
+
+
+select 
+ year(orders.created_at) as yr,
+ month(orders.created_at) as mth,
+ week(orders.created_at) as wk,
+ day(orders.created_at) as dy,
+sum(orders.price_usd) as revenue
+from orders
+ group by 1,2,3
+ order by revenue desc;
+ 
+
+create temporary table revenue
+with weekly_revenue as (
+select 
+ year(orders.created_at) as yr,
+ month(orders.created_at) as mth,
+ week(orders.created_at) as wk,
+  day(orders.created_at) as dy,
+sum(orders.price_usd) as revenue
+from orders
+ group by 1,2,3
+ order by 1,2,3 asc
+ ) 
+select
+ yr,
+mth,
+wk,
+revenue,
+LAG(revenue,1) OVER ( ORDER BY yr, mth, wk, dy asc )  as previous_week_revenue,
+(revenue/ ( LAG(revenue,1)  OVER ( ORDER BY yr, mth, wk, dy asc )) - 1) as percent_change_from_previous_day
+from  weekly_revenue;
+
+
+select * from revenue
+order by percent_change_from_previous_day desc;
 
